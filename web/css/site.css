@@ -122,17 +122,17 @@ a.desc:after {
     clear:left;
 }
 
-.topic-index .vote-buttons {
+.vote-buttons {
     text-align:center;
     width:50px;
 }
-.topic-index .vote-buttons .btn {
+.vote-buttons .btn {
     padding:5px 3px;
 }
-.topic-index .btn.on > .glyphicon-arrow-up {
+.btn.on > .glyphicon-arrow-up {
     color:#0c0;
 }
-.topic-index .btn.on > .glyphicon-arrow-down {
+.btn.on > .glyphicon-arrow-down {
     color:#c00;
 }
 .topic-index .vote-buttons .media-score {
