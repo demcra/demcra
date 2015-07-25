@@ -11,7 +11,6 @@ $this->title = $name;
 ?>
 <div class="site-error">
 
-    <h1><?=Html::encode($this->title)?></h1>
 
 <?php
 switch ($exception->statusCode)
@@ -19,22 +18,25 @@ switch ($exception->statusCode)
 
     case 404:
 ?>
-    <div style="text-align:center;margin:20px auto;">
-        <img src="/img/404.png" alt="" style="width:100%;">
+    <style>body{background-color:#000;}</style>
+    <div style="text-align:center;margin:0 auto 20px;">
+        <img src="/img/404.jpg" alt="Where are you?" style="max-width:100%;">
     </div>
 <?php
         break;
 
     case 451:
 ?>
-    <div style="text-align:center;margin:20px auto;">
-        <img src="/img/451.png" alt="" style="width:100%;">
+    <style>body{background-color:#f14831;}</style>
+    <div style="text-align:center;margin:0 auto 20px;">
+        <img src="/img/451.png" alt="This material has never existed" style="max-width:100%;">
     </div>
 <?php
         break;
 
     default:
 ?>
+    <h1><?=Html::encode($this->title)?></h1>
     <div style="text-align:center;margin:20px auto;">
         <img src="/img/500.png" alt="">
     </div>
