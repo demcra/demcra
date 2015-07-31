@@ -178,6 +178,9 @@ a.desc:after {
     display:none;
 }
 
+.media-tip-score {
+    color:#333;
+}
 
 
 /* vote loading icon */

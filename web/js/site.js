@@ -1,6 +1,24 @@
 "use strict";
 // <script>
 
+
+var my_currencies = [
+    {
+        id: 3,
+        code: 'DOGE'
+    },
+    {
+        id: 2,
+        code: 'LTC'
+    },
+    {
+        id: 1,
+        code: 'BTC'
+    },
+];
+
+
+
 window.onload = function() {
 
     $('.btn-note').click(function(){
@@ -63,6 +81,8 @@ function addNoteForm(note_target) {
     form.appendChild(csrf);
 
 
+    // Body
+
     var div = document.createElement('div');
     div.className = 'form-group field-note-body required';
 
@@ -76,13 +96,74 @@ function addNoteForm(note_target) {
     form.appendChild(div);
 
 
+    // Tip
+
+    var tip_div = document.createElement('div');
+    tip_div.className = 'form-group note-tip clearfix';
+    tip_div.style.display = 'none';
+
+
+    var column = document.createElement('div');
+    column.className = 'col-lg-8';
+
+    var tip_amount = document.createElement('input');
+    tip_amount.name = 'NoteTip[amount]';
+    tip_amount.className = 'form-control';
+    tip_amount.type = 'number';
+    tip_amount.min = 0;
+    tip_amount.step = 0.00000001;
+    tip_amount.placeholder = '0.00000000';
+
+    column.appendChild(tip_amount);
+    tip_div.appendChild(column);
+
+
+    var column = document.createElement('div');
+    column.className = 'col-lg-4';
+
+    var tip_currency = document.createElement('select');
+    tip_currency.name = 'PersonCurrency[currency_id]';
+    tip_currency.className = 'form-control';
+    for (var i in my_currencies)
+    {
+        var option = document.createElement('option');
+        option.value = my_currencies[i].id;
+        option.innerHTML = my_currencies[i].code;
+        tip_currency.appendChild(option);
+    }
+
+    column.appendChild(tip_currency);
+    tip_div.appendChild(column);
+
+    form.appendChild(tip_div);
+
+
+
+    // Buttons
+
     var div = document.createElement('div');
     div.className = 'form-group';
 
     var submit = document.createElement('input');
     submit.type = 'submit';
+    submit.value = 'Submit';
     submit.className = 'btn btn-primary btn-xs';
     form.appendChild(submit);
+
+    form.appendChild(document.createTextNode(' '));
+
+    var tip_button = document.createElement('a');
+    tip_button.className = 'btn btn-success btn-xs';
+    tip_button.innerHTML = 'Tip';
+    if (my_currencies.length)
+    {
+        tip_button.addEventListener('click', function(){ $(tip_div).toggle(); });
+    }
+    else {
+        tip_button.href = '/currency';
+        tip_button.target = '_blank';
+    }
+    form.appendChild(tip_button);
 
     form.appendChild(document.createTextNode(' '));
 
