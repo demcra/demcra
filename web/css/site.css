@@ -139,6 +139,7 @@ a.desc:after {
 .btn.on > .glyphicon-arrow-down {
     color:#c00;
 }
+
 .topic-index .vote-buttons .media-score {
     width:100px;
     margin:2px auto;
@@ -178,8 +179,71 @@ a.desc:after {
     display:none;
 }
 
-.media-tip-score {
+.media-tipped {
     color:#333;
+}
+
+.media-tip-score {
+    color:#79847f;
+    font-weight:bold;
+    margin:2px 5px;
+    padding-left:20px;
+    background:url('/img/demcra-silver.png') no-repeat left center;
+
+}
+.tip-gold {
+    color:#b78910;
+    background-image:url('/img/demcra-gold.png');
+}
+
+.sort-index {
+    margin-bottom:10px;
+}
+
+.tag-list {
+    margin-bottom:10px;
+}
+
+/* expand/collapse notes */
+
+.btn-note-expand {
+    color:#666;
+    text-decoration:none;
+    float:left;
+    margin:2px 5px 5px 0;
+   -moz-user-select: none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+   cursor:pointer;
+}
+
+.btn-note-expand:after {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    padding-left: 5px;
+}
+
+.btn-note-expand:after {
+  content: "\e160";
+}
+
+.note-collapsed .btn-note-expand:after {
+  content: "\e159";
+}
+
+.note-collapsed .btn,
+.note-collapsed .media-note,
+.note-collapsed .div-note,
+.note-collapsed .view-note,
+.note-collapsed .media-tipped {
+    display:none;
 }
 
 

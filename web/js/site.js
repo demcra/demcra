@@ -40,7 +40,13 @@ window.onload = function() {
         $(this).children('span').removeClass('glyphicon-arrow-up');
         $(this).children('span').addClass('glyphicon-asterisk');
         $(this).children('span').addClass('icon-spin');
-        return true;
+        var vote_target_div = $(this).closest('.vote-target');
+        return !sendVote(
+            $(this).hasClass('on') ? 'unvote' : 'vote',
+            vote_target_div.data('table'),
+            vote_target_div.data('id'),
+            this
+        );
     });
 
     $('.btn-condemn').click(function(){
@@ -50,13 +56,108 @@ window.onload = function() {
         $(this).children('span').removeClass('glyphicon-arrow-down');
         $(this).children('span').addClass('glyphicon-asterisk');
         $(this).children('span').addClass('icon-spin');
-        return true;
+        var vote_target_div = $(this).closest('.vote-target');
+        if (!$(this).hasClass('on'))
+        {
+            return !popupCondemnationForm(vote_target_div);
+        }
+        else
+        {
+            return !sendVote(
+                $(this).hasClass('on') ? 'uncondemn' : 'condemn',
+                vote_target_div.data('table'),
+                vote_target_div.data('id'),
+                this
+            );
+        }
+    });
+
+    $('.btn-note-expand').click(function(){
+        var note_div = $(this).closest('.view-note');
+        if (note_div.hasClass('note-collapsed'))
+        {
+            note_div.removeClass('note-collapsed');
+        }
+        else
+        {
+            note_div.addClass('note-collapsed');
+        }
+        console.log(note_div);
     });
 
 }
 
 
 
+
+function sendVote(vote_type, vote_target_type, vote_target_id, link_element) {
+
+    var vote_url = '/'+vote_target_type+'/'+vote_type+'/'+vote_target_id;
+    var vote_modifier = 'e'===vote_type.charAt(vote_type.length-1) ? 1 : -1;
+
+    $.getJSON(
+        vote_url,
+        {
+            _csrf: $('meta[name="csrf-token"]').attr('content')
+        }
+    )
+    .done( function( data ) {
+
+        if ('undefined'!==typeof data.success && data.success)
+        {
+            var alt_link_element = $(link_element).siblings('a.btn').get(0);
+
+            $(link_element).removeClass('btn-disabled');
+            $(alt_link_element).removeClass('btn-disabled');
+            $(link_element).children('span').addClass('glyphicon-arrow-' + ( 1===vote_modifier ? 'up' : 'down' ) );
+            $(link_element).children('span').removeClass('icon-spin');
+            $(link_element).children('span').removeClass('glyphicon-asterisk');
+
+            var score_span = $(link_element).siblings('span.media-score').get(0);
+            var score = parseInt(score_span.innerHTML, 10);
+
+            if ($(link_element).hasClass('on'))
+            {
+                $(link_element).removeClass('on');
+                score -= vote_modifier;
+                if ($(alt_link_element).hasClass('on'))
+                {
+                    $(alt_link_element).removeClass('on');
+                    score -= vote_modifier;
+                }
+            }
+            else
+            {
+                $(link_element).addClass('on');
+                score += vote_modifier;
+                if ($(alt_link_element).hasClass('on'))
+                {
+                    $(alt_link_element).removeClass('on');
+                    score += vote_modifier;
+                }
+            }
+
+            score_span.innerHTML = score;
+        }
+        else
+        {
+            // fallback to click on failure
+            window.location.href = vote_url;
+        }
+    })
+    .fail( function( jqxhr, textStatus, error ) {
+        //var err = textStatus + ", " + error;
+        //console.log( "Request Failed: " + err );
+
+        // fallback to click on failure
+        window.location.href = vote_url;
+
+        // @todo: not logged in? popup a login box
+
+    });
+
+    return true;
+}
 
 
 
@@ -303,6 +404,113 @@ function toggleEditForm(note_target) {
     console.log(note_form.is(':visible'));
     if (note_form.is(':visible')) $(note_target).children('.media-body').children('.media-note').show();
     return note_form.toggle();
+
+};
+
+
+
+
+function popupCondemnationForm(vote_target_div) {
+
+
+    var div_popup = document.createElement('dive');
+
+    var parent_table = $(vote_target_div).data('table');
+    var parent_id = $(vote_target_div).data('id');
+
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/'+parent_table+'/condemn/'+parent_id;
+    form.className = 'condemn-form';
+
+    var csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = '_csrf';
+    csrf.value = $('meta[name="csrf-token"]').attr('content');
+    form.appendChild(csrf);
+
+
+
+    // Reason
+
+    var div = document.createElement('div');
+    div.className = 'form-group required';
+
+    var label = document.createElement('label');
+    label.innerHTML = 'Reason:';
+
+    var select_reason = document.createElement('select');
+    select_reason.name = 'Condemn[reason]';
+    select_reason.className = 'form-control';
+    select_reason.required = true;
+    var select_reasons = ['','spam','plagiarized','malicious','illegal','other'];
+    for (var i in select_reasons)
+    {
+        var option = document.createElement('option');
+        option.innerHTML = select_reasons[i];
+        select_reason.appendChild(option);
+    }
+
+    label.appendChild(select_reason);
+    div.appendChild(label);
+    form.appendChild(div);
+
+
+    // Details
+
+    var div = document.createElement('div');
+    div.className = 'form-group field-note-body required';
+
+    var label = document.createElement('label');
+    label.innerHTML = 'Details:';
+    div.appendChild(label);
+
+    var note = document.createElement('textarea');
+    note.name = 'Condemn[body]';
+    note.className = 'form-control';
+    note.style.width = '100%';
+    note.required = true;
+    note.rows = 5;
+
+    div.appendChild(note);
+    form.appendChild(div);
+
+
+    // Buttons
+
+    var div = document.createElement('div');
+    div.className = 'form-group';
+
+    var submit = document.createElement('input');
+    submit.type = 'submit';
+    submit.value = 'Submit Report';
+    submit.className = 'btn btn-primary btn-xs';
+    form.appendChild(submit);
+
+    div_popup.appendChild(form);
+
+    return BootstrapDialog.show({
+        title: 'Condemnation Report',
+        message: div_popup,
+        buttons: [{
+            label: 'Cancel',
+            action: function(dialogRef){
+                dialogRef.close();
+            }
+        }],
+        onhide: function(dialogRef){
+
+            var link_element = $(vote_target_div).children('.vote-buttons').children('a.btn-condemn');
+            var alt_link_element = $(vote_target_div).children('.vote-buttons').children('a.btn-vote');
+
+            $(link_element).removeClass('btn-disabled');
+            $(alt_link_element).removeClass('btn-disabled');
+            $(link_element).children('span').addClass('glyphicon-arrow-down');
+            $(link_element).children('span').removeClass('icon-spin');
+            $(link_element).children('span').removeClass('glyphicon-asterisk');
+        }
+
+    });
 
 };
 
