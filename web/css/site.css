@@ -126,6 +126,15 @@ a.desc:after {
     clear:left;
 }
 
+
+.markdown-editor-div,
+.editor-help {
+    display:none;
+}
+.markdown-editor-div > .ProseMirror > .ProseMirror-content {
+    min-height:128px;
+}
+
 .vote-buttons {
     text-align:center;
     width:50px;
